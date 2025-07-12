@@ -142,66 +142,9 @@
            80% {background: #ffff84;}
        }
 
-       /* New CSS for the Beating Heart */
-       .heart-container {
-           position: absolute; /* Position relative to the body */
-           top: 48%;
-           left: 48%;
-           transform: translate(-50%, -50%)rotate(90deg); /* Center the heart */
-           width: 80px; /* Size of the heart */
-           height: 72px; /* Adjusted height for heart shape */
-           z-index: 0; /* Behind the button */
-           opacity: 1; /* Initially visible, controlled by JS */
-           transition: opacity 0.5s ease-out; /* Smooth fade out */
-           pointer-events: none; /* Allow clicks to pass through */
-       }
-
-       .heart {
-           position: relative;
-           width: 50%;
-           height: 50%;
-           background-color: #ff0000; /* Red heart color */
-           transform: rotate(-45deg); /* Rotate to form heart shape */
-           transform-origin: center center; /* Ensure correct rotation origin */
-           animation: beat 1s infinite; /* Apply beating animation */
-       }
-
-       .heart::before,
-       .heart::after {
-           content: '';
-           position: absolute;
-           width: 100%;
-           height: 100%;
-           background-color: #ff0000; /* Match heart color */
-           border-radius: 50%; /* Make circular */
-       }
-
-       .heart::before {
-           top: -50%;
-           left: 0;
-       }
-
-       .heart::after {
-           top: 0;
-           left: 50%;
-       }
-
-       @keyframes beat {
-           0% { transform: scale(1) rotate(-22deg); }
-           20% { transform: scale(1.1) rotate(-22deg); } /* Larger during beat */
-           40% { transform: scale(1) rotate(-22deg); }
-           60% { transform: scale(1.1) rotate(-22deg); }
-           80% { transform: scale(1) rotate(-22deg); }
-           100% { transform: scale(1) rotate(-22deg); }
-       }
    </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
-
-    <!-- New: Heart Container -->
-    <div id="heartContainer" class="heart-container">
-        <div class="heart"></div>
-    </div>
 
     <!-- New: Explosion Container -->
     <div id="explosionContainer" class="explosion-container">
@@ -238,7 +181,6 @@
        const resetButton = document.getElementById('resetButton');
        const body = document.body;
        const explosionContainer = document.getElementById('explosionContainer');
-       const heartContainer = document.getElementById('heartContainer'); // Get reference to heart container
 
        // State variables
        let desperationTimeout;
@@ -248,7 +190,6 @@
        let startTime = 0;
        let isAngry = false;
        let explosionsActive = false;
-       let heartActive = false; // New state variable for heart
 
        // New variables for precise scaling
        let maxAllowedScale = 1.0;
@@ -256,7 +197,6 @@
        const TOTAL_ACTIVE_DURATION = 300000; // 5 minutes in milliseconds
        const SUPER_ANGRY_THRESHOLD = TOTAL_ACTIVE_DURATION - 120000; // 3 minutes mark (5 - 2 minutes)
        const EXPLOSION_START_TIME = TOTAL_ACTIVE_DURATION - 60000; // 4 minutes mark (5 - 1 minute)
-       const HEART_DURATION = 20000; // 30 seconds for heart animation
 
        // --- Messages ---
        const desperateMessages = [
@@ -337,8 +277,6 @@
                pleadingButton.style.setProperty('--shake-intensity', '0px'); // Reset shake intensity visual
                body.style.backgroundColor = '#1a1a1a'; // Darken background slightly more
                explosionContainer.style.opacity = '0'; // Hide explosions
-               heartContainer.style.opacity = '0'; // Hide heart
-               heartContainer.style.animation = 'none'; // Stop heart animation
 
                // Set final state styles
                pleadingButton.style.color = '#cccccc'; // Gray font color
@@ -364,14 +302,6 @@
                explosionsActive = true;
                explosionContainer.style.opacity = '1'; // Make explosions visible
            }
-
-           // --- Deactivate Heart after 30 seconds ---
-           if (!heartActive && elapsedTime >= HEART_DURATION) { // Corrected logic: if heart was active and time passed
-               heartActive = true; // Mark as deactivated
-               heartContainer.style.opacity = '0'; // Hide heart
-               heartContainer.style.animation = 'none'; // Stop heart animation
-           }
-
 
            // --- Button Color Transition ---
            const colorProgress = Math.min(desperationLevel / 25, 1); // Full red after 25 shakes
@@ -500,7 +430,6 @@
            isAngry = false;
            startTime = Date.now();
            explosionsActive = false; // Reset explosions active state
-           heartActive = false; // Reset heart active state
            body.style.backgroundColor = '#374151'; 
            
            // Reset button style to initial blue
