@@ -14,26 +14,43 @@
            background-color: #374151;
            transition: background-color 1s linear;
            overflow: hidden; /* Prevent scrollbars when button gets large */
+           margin: 0; /* Added from new CSS */
        }
        /* Horizontal Shake animation */
        @keyframes shake-horizontal {
-           0%, 100% { transform: translateX(0) scale(var(--scale, 1)); }
-           10%, 30%, 50%, 70%, 90% { transform: translateX(calc(-1 * var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
-           20%, 40%, 60%, 80% { transform: translateX(var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
+           0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
        }
        /* Vertical Shake animation */
        @keyframes shake-vertical {
-           0%, 100% { transform: translateY(0) scale(var(--scale, 1)); }
-           10%, 30%, 50%, 70%, 90% { transform: translateY(calc(-1 * var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
-           20%, 40%, 60%, 80% { transform: translateY(var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
+           0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
        }
 
        /* Classes to apply the animations */
        .shake-horizontal {
-           animation: shake-horizontal 0.4s ease-in-out;
+           animation: shake-horizontal 0.4s;
        }
        .shake-vertical {
-           animation: shake-vertical 0.4s ease-in-out;
+           animation: shake-vertical 0.4s;
        }
 
        /* --- Enhanced Skeuomorphic Button Style --- */
@@ -54,13 +71,153 @@
        .pleading-button:active {
            transform: translateY(5px) scale(var(--scale));
        }
+
+       /* New CSS for Explosions */
+       .explosion-container { /* Renamed from .container to avoid conflict */
+           position: fixed; /* Use fixed to cover viewport */
+           top: 0;
+           left: 0;
+           width: 100vw; /* Cover full viewport width */
+           height: 100vh; /* Cover full viewport height */
+           overflow: hidden;
+           z-index: 0; /* Place behind the button */
+           pointer-events: none; /* Allow clicks to pass through */
+           opacity: 0; /* Initially hidden */
+           transition: opacity 1s ease-in-out; /* Smooth fade-in */
+           background-color: transparent; /* Ensure it's transparent initially */
+       }
+
+       .explosions span {
+           position: absolute;
+           width: 50px;
+           height: 50px;
+           border-radius: 50%;
+           transform: scale(0);
+           /* Added random positioning for a more spread out effect */
+           left: calc(var(--x) * 1vw);
+           top: calc(var(--y) * 1vh);
+       }
+
+       .explosions span:nth-child(1) {
+           animation: explosions-anim 2s 0s linear infinite,
+               color-anim 2.5s 0s linear infinite;
+       }
+
+       .explosions span:nth-child(2) {
+           animation: explosions-anim 2s 0.2s linear infinite,
+               color-anim 2.5s -1s linear infinite;
+       }
+
+       .explosions span:nth-child(3) {
+           animation: explosions-anim 2s 0.4s linear infinite,
+               color-anim 2.5s -2s linear infinite;
+       }
+
+       .explosions span:nth-child(4) {
+           animation: explosions-anim 2s 0.6s linear infinite,
+               color-anim 2.5s -3s linear infinite;
+       }
+
+       .explosions span:nth-child(5) {
+           animation: explosions-anim 2s 0.8s linear infinite,
+               color-anim 2.5s -4s linear infinite;
+       }
+
+
+       @keyframes explosions-anim {
+           0% {transform: scale(0);}
+           35% {transform: scale(0);}
+           49.9% {transform: scale(1);}
+           50% {transform: scale(0);}
+           80% {transform: scale(0);}
+           99.9% {transform: scale(2);}
+           100% {transform: scale(0);}
+       }
+
+       @keyframes color-anim {
+           0%, 100% {background: #293529;}
+           20% {background: #3f0215;}
+           40% {background: #a83c3c;}
+           60% {background: #ff8484;}
+           80% {background: #ffff84;}
+       }
+
+       /* New CSS for the Beating Heart */
+       .heart-container {
+           position: absolute; /* Position relative to the body */
+           top: 48%;
+           left: 48%;
+           transform: translate(-50%, -50%)rotate(90deg); /* Center the heart */
+           width: 80px; /* Size of the heart */
+           height: 72px; /* Adjusted height for heart shape */
+           z-index: 0; /* Behind the button */
+           opacity: 1; /* Initially visible, controlled by JS */
+           transition: opacity 0.5s ease-out; /* Smooth fade out */
+           pointer-events: none; /* Allow clicks to pass through */
+       }
+
+       .heart {
+           position: relative;
+           width: 50%;
+           height: 50%;
+           background-color: #ff0000; /* Red heart color */
+           transform: rotate(-45deg); /* Rotate to form heart shape */
+           transform-origin: center center; /* Ensure correct rotation origin */
+           animation: beat 1s infinite; /* Apply beating animation */
+       }
+
+       .heart::before,
+       .heart::after {
+           content: '';
+           position: absolute;
+           width: 100%;
+           height: 100%;
+           background-color: #ff0000; /* Match heart color */
+           border-radius: 50%; /* Make circular */
+       }
+
+       .heart::before {
+           top: -50%;
+           left: 0;
+       }
+
+       .heart::after {
+           top: 0;
+           left: 50%;
+       }
+
+       @keyframes beat {
+           0% { transform: scale(1) rotate(-22deg); }
+           20% { transform: scale(1.1) rotate(-22deg); } /* Larger during beat */
+           40% { transform: scale(1) rotate(-22deg); }
+           60% { transform: scale(1.1) rotate(-22deg); }
+           80% { transform: scale(1) rotate(-22deg); }
+           100% { transform: scale(1) rotate(-22deg); }
+       }
    </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
 
-   <div id="app-container" class="text-center p-8">
+    <!-- New: Heart Container -->
+    <div id="heartContainer" class="heart-container">
+        <div class="heart"></div>
+    </div>
+
+    <!-- New: Explosion Container -->
+    <div id="explosionContainer" class="explosion-container">
+        <div class="explosions">
+            <!-- These spans will be positioned dynamically by JS for spread -->
+            <span style="--x: 20; --y: 30;"></span>
+            <span style="--x: 70; --y: 60;"></span>
+            <span style="--x: 45; --y: 80;"></span>
+            <span style="--x: 85; --y: 20;"></span>
+            <span style="--x: 10; --y: 70;"></span>
+        </div>
+    </div>
+
+   <div id="app-container" class="text-center p-8 relative z-10"> <!-- Added relative and z-10 to keep button above explosions -->
        <!-- The main button that begs to be pressed -->
-       <button id="pleadingButton" class="pleading-button py-5 px-10 text-2xl focus:outline-none">
+       <button id="pleadingButton" class="pleading-button py-1 px-2" style="font-size: 0.5rem;" focus:outline-none>
            Press Me
        </button>
 
@@ -80,68 +237,141 @@
        const thankYouMessage = document.getElementById('thankYouMessage');
        const resetButton = document.getElementById('resetButton');
        const body = document.body;
+       const explosionContainer = document.getElementById('explosionContainer');
+       const heartContainer = document.getElementById('heartContainer'); // Get reference to heart container
 
        // State variables
        let desperationTimeout;
        let desperationLevel = 0;
        let currentScale = 1.0;
-       let shakeIntensity = 5;
+       let shakeIntensity = 3;
        let startTime = 0;
        let isAngry = false;
+       let explosionsActive = false;
+       let heartActive = false; // New state variable for heart
 
        // New variables for precise scaling
-       // baseButtonWidth and baseButtonHeight will now be calculated dynamically within calculateMaxAllowedScale
        let maxAllowedScale = 1.0;
        const MAX_WIDTH_PX = 600; // Maximum pixel width
+       const TOTAL_ACTIVE_DURATION = 300000; // 5 minutes in milliseconds
+       const SUPER_ANGRY_THRESHOLD = TOTAL_ACTIVE_DURATION - 120000; // 3 minutes mark (5 - 2 minutes)
+       const EXPLOSION_START_TIME = TOTAL_ACTIVE_DURATION - 60000; // 4 minutes mark (5 - 1 minute)
+       const HEART_DURATION = 20000; // 30 seconds for heart animation
 
        // --- Messages ---
        const desperateMessages = [
-           "Go on, press it...", "Please press me!", "It won't take a second...",
-           "I'm just a lonely button, hoping that someone like you will come along and press me.",
-           "I'm really begging you now!", "JUST ONE CLICK!",
-           "You have no idea how much it would mean to me if you would just give me a single moment to give me a click.",
-           "Every second that goes by without a click feels like an eternity. Please, put me out of my misery and press me.",
-           "I can't take it anymore!", "PRESS. THE. BUTTON."
+           "Go on, press it... 🥹", 
+		   "Please press me!", 
+		   "It won't take a second...",
+           "I'm just a lonely button, 🥹 please press me.",
+           "I'm really begging you now! 🥺", 
+		   "JUST ONE CLICK!",
+           "You have no idea how much it would mean to me if you'd give me a click.",
+           "Every second that goes by without a click feels like an eternity.", 
+		   "Please, put me out of my misery 🥹 and press me.",
+           "I can't take it anymore!", 
+		   "PRESS. THE. BUTTON.",
+		   "Just a tiny click, please?",
+		   "Don't leave me hanging!",
+		   "I'm feeling neglected...",
+		   "I dream of being pressed.",
+		   "Please, 🥺 for the love of buttons!",
        ];
        const angryMessages = [
-           "ARE YOU KIDDING ME?!", "PRESS IT ALREADY!", "MY PATIENCE IS GONE!",
-           "I have been waiting for what feels like an eternity, and my patience has officially worn completely thin!",
-           "YOU'RE DOING THIS ON PURPOSE!", "I'M WARNING YOU!",
-           "Do you derive some sort of twisted pleasure from watching me suffer? Just press the button and end this pointless charade!",
-           "THIS IS YOUR LAST CHANCE!"
+           "ARE YOU KIDDING ME?!", 
+		   "PRESS IT ALREADY!", 
+		   "MY PATIENCE IS GONE!",
+           "PRESS! THE! BUTTON!",
+		   "I have been waiting for what feels like an eternity, and my patience has officially worn thin!",
+           "YOU'RE DOING THIS ON PURPOSE! 😨", 
+		   "I'M WARNING YOU!",
+           "Do you derive some sort of twisted pleasure from watching me suffer?", 
+           "Just press the button and end this pointless charade!",
+           "THIS IS YOUR LAST CHANCE!",
+		   "MY FURY GROWS!",
+		   "I'M ABOUT TO EXPLODE!",
+		   "😱 DO YOU ENJOY MY SUFFERING?! 😱",
+		   "YOU'VE BEEN WARNED!",
+           // Extremely angry messages for the final 2 minutes
+           "PRESS THE DAMN BUTTON!",
+           "WHAT THE HELL ARE YOU WAITING FOR?!",
+           "I SWEAR TO GOD, PRESS IT NOW!",
+           "YOU'RE F***ING TESTING MY PATIENCE!",
+           "I'M GOING TO LOSE MY SH*T IF YOU DON'T CLICK!"
        ];
 
        // New: Angry Emojis
-       const angryEmojis = ["😡", "�", "🤬", "😤"];
+       const angryEmojis = ["😡", "👿", "🤬", "😤", "🖕", "😾", "�", ]; 
 
        // --- Color Definitions for Interpolation ---
        const startColor = { top: {r:99, g:102, b:241}, bottom: {r:79, g:70, b:229}, shadow: {r:49, g:46, b:129} };
        const endColor   = { top: {r:239, g:68, b:68}, bottom: {r:220, g:38, b:38}, shadow: {r:153, g:27, b:27} };
+       // New: Disabled (Black) Color
+       const disabledColor = { top: {r:50, g:50, b:50}, bottom: {r:20, g:20, b:20}, shadow: {r:0, g:0, b:0} };
+
 
        // Helper function to interpolate between two numbers
        const interpolate = (start, end, progress) => Math.floor(start + (end - start) * progress);
 
        // --- Core Logic ---
        const scheduleNextUpdate = () => {
-           const minDelay = 2000;
-           const maxDelay = 8000;
+           const minDelay = 1000;
+           const maxDelay = 6000;
            const randomDelay = Math.random() * (maxDelay - minDelay) + minDelay;
            desperationTimeout = setTimeout(increaseDesperation, randomDelay);
        };
 
        const increaseDesperation = () => {
+           const elapsedTime = Date.now() - startTime;
+
+           // Check if 5 minutes have passed
+           if (elapsedTime >= TOTAL_ACTIVE_DURATION) {
+               clearTimeout(desperationTimeout); // Stop further updates
+               pleadingButton.disabled = true; // Disable the button
+               pleadingButton.textContent = "I give up... ☠️"; // Change text
+               pleadingButton.style.background = `linear-gradient(to bottom, rgb(${disabledColor.top.r},${disabledColor.top.g},${disabledColor.top.b}), rgb(${disabledColor.bottom.r},${disabledColor.bottom.g},${disabledColor.bottom.b}))`;
+               pleadingButton.style.borderColor = `rgb(${disabledColor.bottom.r},${disabledColor.bottom.g},${disabledColor.bottom.b})`;
+               pleadingButton.style.borderTopColor = `rgb(${disabledColor.top.r},${disabledColor.top.g},${disabledColor.top.b})`;
+               pleadingButton.style.boxShadow = `0 5px 0 rgb(${disabledColor.shadow.r},${disabledColor.shadow.g},${disabledColor.shadow.b}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
+               pleadingButton.style.animation = 'none'; // Stop shaking
+               pleadingButton.style.setProperty('--shake-intensity', '0px'); // Reset shake intensity visual
+               body.style.backgroundColor = '#1a1a1a'; // Darken background slightly more
+               explosionContainer.style.opacity = '0'; // Hide explosions
+               heartContainer.style.opacity = '0'; // Hide heart
+               heartContainer.style.animation = 'none'; // Stop heart animation
+
+               // Set final state styles
+               pleadingButton.style.color = '#cccccc'; // Gray font color
+               pleadingButton.style.fontSize = '1.25rem'; // Reduced text size (e.g., text-xl equivalent)
+               pleadingButton.style.setProperty('--scale', '1'); // Reduced button size (half its current size)
+
+               return; // Exit function
+           }
+
            desperationLevel++;
 
            // --- Background Color Transition ---
-           const totalDuration = 300000; // 5 minutes
-           const elapsedTime = Date.now() - startTime;
-           let bgProgress = Math.min(elapsedTime / totalDuration, 1);
+           let bgProgress = Math.min(elapsedTime / TOTAL_ACTIVE_DURATION, 1);
            const bgStart = { r: 55, g: 65, b: 81 };
            const bgEnd = { r: 69, g: 10, b: 10 };
            const r_bg = interpolate(bgStart.r, bgEnd.r, bgProgress);
            const g_bg = interpolate(bgStart.g, bgEnd.g, bgProgress);
-           const b_bg = interpolate(bgStart.b, endColor.b, bgProgress); // Fixed typo: should be bgEnd.b
+           const b_bg = interpolate(bgStart.b, bgEnd.b, bgProgress); 
            body.style.backgroundColor = `rgb(${r_bg}, ${g_bg}, ${b_bg})`;
+
+           // --- Activate Explosions after 4 minutes ---
+           if (!explosionsActive && elapsedTime >= EXPLOSION_START_TIME) {
+               explosionsActive = true;
+               explosionContainer.style.opacity = '1'; // Make explosions visible
+           }
+
+           // --- Deactivate Heart after 30 seconds ---
+           if (!heartActive && elapsedTime >= HEART_DURATION) { // Corrected logic: if heart was active and time passed
+               heartActive = true; // Mark as deactivated
+               heartContainer.style.opacity = '0'; // Hide heart
+               heartContainer.style.animation = 'none'; // Stop heart animation
+           }
+
 
            // --- Button Color Transition ---
            const colorProgress = Math.min(desperationLevel / 25, 1); // Full red after 25 shakes
@@ -158,20 +388,49 @@
            pleadingButton.style.background = `linear-gradient(to bottom, rgb(${r_top},${g_top},${b_top}), rgb(${r_bot},${g_bot},${b_bot}))`;
            pleadingButton.style.borderColor = `rgb(${r_bot},${g_bot},${b_bot})`;
            pleadingButton.style.borderTopColor = `rgb(${r_top},${g_top},${b_top})`;
-           pleadingButton.style.boxShadow = `0 10px 0 rgb(${r_shadow},${g_shadow},${b_shadow}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
+           pleadingButton.style.boxShadow = `0 1px 0 rgb(${r_shadow},${g_shadow},${b_shadow}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
 
-           // --- Angry Message Check & Emoji Addition (moved before scale calculation) ---
-           if (!isAngry && Date.now() - startTime > 60000) { // 60 seconds
+           // --- Message and Emoji Logic ---
+           let buttonText;
+           const messages = isAngry ? angryMessages : desperateMessages;
+           
+           if (!isAngry && elapsedTime > 60000) { // 60 seconds
                isAngry = true;
                desperationLevel = 0; // Reset message cycle for angry messages
            }
-           const messages = isAngry ? angryMessages : desperateMessages;
-           let buttonText = messages[desperationLevel % messages.length];
+
+           buttonText = messages[desperationLevel % messages.length];
 
            if (isAngry) {
-               let emojiCount = Math.floor(Math.random() * 2) + 1; // 1 or 2 emojis
-               for (let i = 0; i < emojiCount; i++) {
-                   buttonText += " " + angryEmojis[Math.floor(Math.random() * angryEmojis.length)];
+               // Determine if we are in the "super angry" phase (last 2 minutes)
+               const isSuperAngry = elapsedTime >= SUPER_ANGRY_THRESHOLD;
+
+               if (isSuperAngry) {
+                   // Split message into words
+                   const words = buttonText.split(' ');
+                   let newTextParts = [];
+
+                   // Add emoji at the very beginning
+                   newTextParts.push(angryEmojis[Math.floor(Math.random() * angryEmojis.length)]);
+
+                   // Iterate through words, adding emojis between and after
+                   for (let i = 0; i < words.length; i++) {
+                       newTextParts.push(words[i]);
+                       // Randomly add an emoji after a word (not necessarily after every word)
+                       if (Math.random() < 0.5 && i < words.length - 1) { // 50% chance, not after the last word
+                           newTextParts.push(angryEmojis[Math.floor(Math.random() * angryEmojis.length)]);
+                       }
+                   }
+                   // Add an emoji at the very end
+                   newTextParts.push(angryEmojis[Math.floor(Math.random() * angryEmojis.length)]);
+
+                   buttonText = newTextParts.join(' ');
+               } else {
+                   // Normal angry state: emojis only at the end
+                   let emojiCount = Math.floor(Math.random() * 2) + 1; // 1 or 2 emojis
+                   for (let i = 0; i < emojiCount; i++) {
+                       buttonText += " " + angryEmojis[Math.floor(Math.random() * angryEmojis.length)];
+                   }
                }
            }
            pleadingButton.textContent = buttonText; // Set the combined text and emojis
@@ -240,6 +499,8 @@
            shakeIntensity = 5; // Reset shake intensity to initial value
            isAngry = false;
            startTime = Date.now();
+           explosionsActive = false; // Reset explosions active state
+           heartActive = false; // Reset heart active state
            body.style.backgroundColor = '#374151'; 
            
            // Reset button style to initial blue
@@ -254,6 +515,15 @@
            
            pleadingButton.classList.remove('hidden');
            thankYouMessage.classList.add('hidden');
+           pleadingButton.disabled = false; // Ensure button is enabled on reset
+           pleadingButton.style.animation = ''; // Re-enable animation if it was set to 'none'
+           pleadingButton.style.color = 'white'; // Reset font color to white
+           pleadingButton.style.fontSize = '0.5rem'; // Reset font size to original (0.5rem)
+           explosionContainer.style.opacity = '0'; // Ensure explosions are hidden on reset
+
+           // Show heart and start its animation on reset
+           heartContainer.style.opacity = '1';
+           heartContainer.style.animation = 'beat 1s infinite';
 
            // Calculate base dimensions and max allowed scale on start
            calculateMaxAllowedScale();
