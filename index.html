@@ -123,7 +123,6 @@
                color-anim 2.5s -4s linear infinite;
        }
 
-
        @keyframes explosions-anim {
            0% {transform: scale(0);}
            35% {transform: scale(0);}
@@ -141,7 +140,6 @@
            60% {background: #ff8484;}
            80% {background: #ffff84;}
        }
-
    </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
@@ -272,7 +270,7 @@
                pleadingButton.style.background = `linear-gradient(to bottom, rgb(${disabledColor.top.r},${disabledColor.top.g},${disabledColor.top.b}), rgb(${disabledColor.bottom.r},${disabledColor.bottom.g},${disabledColor.bottom.b}))`;
                pleadingButton.style.borderColor = `rgb(${disabledColor.bottom.r},${disabledColor.bottom.g},${disabledColor.bottom.b})`;
                pleadingButton.style.borderTopColor = `rgb(${disabledColor.top.r},${disabledColor.top.g},${disabledColor.top.b})`;
-               pleadingButton.style.boxShadow = `0 5px 0 rgb(${disabledColor.shadow.r},${disabledColor.shadow.g},${disabledColor.shadow.b}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
+               pleadingButton.style.boxShadow = `0 1px 0 rgb(${disabledColor.shadow.r},${disabledColor.shadow.g},${disabledColor.shadow.b}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
                pleadingButton.style.animation = 'none'; // Stop shaking
                pleadingButton.style.setProperty('--shake-intensity', '0px'); // Reset shake intensity visual
                body.style.backgroundColor = '#1a1a1a'; // Darken background slightly more
@@ -436,7 +434,7 @@
            pleadingButton.style.background = `linear-gradient(to bottom, rgb(${startColor.top.r},${startColor.top.g},${startColor.top.b}), rgb(${startColor.bottom.r},${startColor.bottom.g},${startColor.bottom.b}))`;
            pleadingButton.style.borderColor = `rgb(${startColor.bottom.r},${startColor.bottom.g},${startColor.bottom.b})`;
            pleadingButton.style.borderTopColor = `rgb(${startColor.top.r},${startColor.top.g},${startColor.top.b})`;
-           pleadingButton.style.boxShadow = `0 10px 0 rgb(${startColor.shadow.r},${startColor.shadow.g},${startColor.shadow.b}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
+           pleadingButton.style.boxShadow = `0 1px 0 rgb(${startColor.shadow.r},${startColor.shadow.g},${startColor.shadow.b}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
 
            pleadingButton.style.setProperty('--scale', currentScale);
            pleadingButton.style.setProperty('--shake-intensity', `${shakeIntensity}px`);
@@ -449,10 +447,6 @@
            pleadingButton.style.color = 'white'; // Reset font color to white
            pleadingButton.style.fontSize = '0.5rem'; // Reset font size to original (0.5rem)
            explosionContainer.style.opacity = '0'; // Ensure explosions are hidden on reset
-
-           // Show heart and start its animation on reset
-           heartContainer.style.opacity = '1';
-           heartContainer.style.animation = 'beat 1s infinite';
 
            // Calculate base dimensions and max allowed scale on start
            calculateMaxAllowedScale();
