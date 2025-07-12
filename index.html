@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>The Begging Button</title>
+   <script src="https://cdn.tailwindcss.com"></script>
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+   <style>
+       body {
+           font-family: 'Poppins', sans-serif;
+           background-color: #374151;
+           transition: background-color 1s linear;
+           overflow: hidden; /* Prevent scrollbars when button gets large */
+       }
+       /* Horizontal Shake animation */
+       @keyframes shake-horizontal {
+           0%, 100% { transform: translateX(0) scale(var(--scale, 1)); }
+           10%, 30%, 50%, 70%, 90% { transform: translateX(calc(-1 * var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
+           20%, 40%, 60%, 80% { transform: translateX(var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
+       }
+       /* Vertical Shake animation */
+       @keyframes shake-vertical {
+           0%, 100% { transform: translateY(0) scale(var(--scale, 1)); }
+           10%, 30%, 50%, 70%, 90% { transform: translateY(calc(-1 * var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
+           20%, 40%, 60%, 80% { transform: translateY(var(--shake-intensity, 5px))) scale(var(--scale, 1)); }
+       }
+
+       /* Classes to apply the animations */
+       .shake-horizontal {
+           animation: shake-horizontal 0.4s ease-in-out;
+       }
+       .shake-vertical {
+           animation: shake-vertical 0.4s ease-in-out;
+       }
+
+       /* --- Enhanced Skeuomorphic Button Style --- */
+       /* Color properties are now set dynamically via JS */
+       .pleading-button {
+           --scale: 1.0;
+           --shake-intensity: 5px;
+           transform: scale(var(--scale));
+           transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background 0.3s ease;
+           border: 1px solid;
+           border-radius: 12px;
+           color: white;
+           font-weight: 600;
+           text-shadow: 0 -1px 1px rgba(0,0,0,0.4);
+       }
+
+       /* The active state is simplified as colors are dynamic */
+       .pleading-button:active {
+           transform: translateY(5px) scale(var(--scale));
+       }
+   </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+   <div id="app-container" class="text-center p-8">
+       <!-- The main button that begs to be pressed -->
+       <button id="pleadingButton" class="pleading-button py-5 px-10 text-2xl focus:outline-none">
+           Press Me
+       </button>
+
+       <!-- Thank you message and reset option, initially hidden -->
+       <div id="thankYouMessage" class="hidden">
+           <h1 class="text-5xl font-bold text-green-400 mb-4" style="text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Thank You!</h1>
+           <p class="text-xl text-gray-200 mb-8">Finally! Peace and quiet.</p>
+           <button id="resetButton" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400">
+               Try Again?
+           </button>
+       </div>
+   </div>
+
+   <script>
+       // DOM element references
+       const pleadingButton = document.getElementById('pleadingButton');
+       const thankYouMessage = document.getElementById('thankYouMessage');
+       const resetButton = document.getElementById('resetButton');
+       const body = document.body;
+
+       // State variables
+       let desperationTimeout;
+       let desperationLevel = 0;
+       let currentScale = 1.0;
+       let shakeIntensity = 5;
+       let startTime = 0;
+       let isAngry = false;
+
+       // New variables for precise scaling
+       // baseButtonWidth and baseButtonHeight will now be calculated dynamically within calculateMaxAllowedScale
+       let maxAllowedScale = 1.0;
+       const MAX_WIDTH_PX = 600; // Maximum pixel width
+
+       // --- Messages ---
+       const desperateMessages = [
+           "Go on, press it...", "Please press me!", "It won't take a second...",
+           "I'm just a lonely button, hoping that someone like you will come along and press me.",
+           "I'm really begging you now!", "JUST ONE CLICK!",
+           "You have no idea how much it would mean to me if you would just give me a single moment to give me a click.",
+           "Every second that goes by without a click feels like an eternity. Please, put me out of my misery and press me.",
+           "I can't take it anymore!", "PRESS. THE. BUTTON."
+       ];
+       const angryMessages = [
+           "ARE YOU KIDDING ME?!", "PRESS IT ALREADY!", "MY PATIENCE IS GONE!",
+           "I have been waiting for what feels like an eternity, and my patience has officially worn completely thin!",
+           "YOU'RE DOING THIS ON PURPOSE!", "I'M WARNING YOU!",
+           "Do you derive some sort of twisted pleasure from watching me suffer? Just press the button and end this pointless charade!",
+           "THIS IS YOUR LAST CHANCE!"
+       ];
+
+       // New: Angry Emojis
+       const angryEmojis = ["😡", "�", "🤬", "😤"];
+
+       // --- Color Definitions for Interpolation ---
+       const startColor = { top: {r:99, g:102, b:241}, bottom: {r:79, g:70, b:229}, shadow: {r:49, g:46, b:129} };
+       const endColor   = { top: {r:239, g:68, b:68}, bottom: {r:220, g:38, b:38}, shadow: {r:153, g:27, b:27} };
+
+       // Helper function to interpolate between two numbers
+       const interpolate = (start, end, progress) => Math.floor(start + (end - start) * progress);
+
+       // --- Core Logic ---
+       const scheduleNextUpdate = () => {
+           const minDelay = 2000;
+           const maxDelay = 8000;
+           const randomDelay = Math.random() * (maxDelay - minDelay) + minDelay;
+           desperationTimeout = setTimeout(increaseDesperation, randomDelay);
+       };
+
+       const increaseDesperation = () => {
+           desperationLevel++;
+
+           // --- Background Color Transition ---
+           const totalDuration = 300000; // 5 minutes
+           const elapsedTime = Date.now() - startTime;
+           let bgProgress = Math.min(elapsedTime / totalDuration, 1);
+           const bgStart = { r: 55, g: 65, b: 81 };
+           const bgEnd = { r: 69, g: 10, b: 10 };
+           const r_bg = interpolate(bgStart.r, bgEnd.r, bgProgress);
+           const g_bg = interpolate(bgStart.g, bgEnd.g, bgProgress);
+           const b_bg = interpolate(bgStart.b, endColor.b, bgProgress); // Fixed typo: should be bgEnd.b
+           body.style.backgroundColor = `rgb(${r_bg}, ${g_bg}, ${b_bg})`;
+
+           // --- Button Color Transition ---
+           const colorProgress = Math.min(desperationLevel / 25, 1); // Full red after 25 shakes
+           const r_top = interpolate(startColor.top.r, endColor.top.r, colorProgress);
+           const g_top = interpolate(startColor.top.g, endColor.top.g, colorProgress);
+           const b_top = interpolate(startColor.top.b, endColor.top.b, colorProgress);
+           const r_bot = interpolate(startColor.bottom.r, endColor.bottom.r, colorProgress);
+           const g_bot = interpolate(startColor.bottom.g, endColor.bottom.g, colorProgress);
+           const b_bot = interpolate(startColor.bottom.b, endColor.bottom.b, colorProgress);
+           const r_shadow = interpolate(startColor.shadow.r, endColor.shadow.r, colorProgress);
+           const g_shadow = interpolate(startColor.shadow.g, endColor.shadow.g, colorProgress);
+           const b_shadow = interpolate(startColor.shadow.b, endColor.shadow.b, colorProgress);
+           
+           pleadingButton.style.background = `linear-gradient(to bottom, rgb(${r_top},${g_top},${b_top}), rgb(${r_bot},${g_bot},${b_bot}))`;
+           pleadingButton.style.borderColor = `rgb(${r_bot},${g_bot},${b_bot})`;
+           pleadingButton.style.borderTopColor = `rgb(${r_top},${g_top},${b_top})`;
+           pleadingButton.style.boxShadow = `0 10px 0 rgb(${r_shadow},${g_shadow},${b_shadow}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
+
+           // --- Angry Message Check & Emoji Addition (moved before scale calculation) ---
+           if (!isAngry && Date.now() - startTime > 60000) { // 60 seconds
+               isAngry = true;
+               desperationLevel = 0; // Reset message cycle for angry messages
+           }
+           const messages = isAngry ? angryMessages : desperateMessages;
+           let buttonText = messages[desperationLevel % messages.length];
+
+           if (isAngry) {
+               let emojiCount = Math.floor(Math.random() * 2) + 1; // 1 or 2 emojis
+               for (let i = 0; i < emojiCount; i++) {
+                   buttonText += " " + angryEmojis[Math.floor(Math.random() * angryEmojis.length)];
+               }
+           }
+           pleadingButton.textContent = buttonText; // Set the combined text and emojis
+
+           // Recalculate maxAllowedScale based on current text content (after text is set)
+           calculateMaxAllowedScale();
+
+           // --- Calculate next scale and cap it at maxAllowedScale ---
+           let nextScale = currentScale + 0.1;
+           currentScale = Math.min(nextScale, maxAllowedScale);
+           pleadingButton.style.setProperty('--scale', currentScale);
+
+           // --- Intensify & Randomize Shake ---
+           if (isAngry) {
+               shakeIntensity += 10; // Much larger increment when angry
+           } else {
+               shakeIntensity += 2; // Normal increment when desperate
+           }
+           pleadingButton.style.setProperty('--shake-intensity', `${shakeIntensity}px`);
+           if (Math.random() < 0.3) {
+               pleadingButton.classList.add('shake-vertical');
+               setTimeout(() => { pleadingButton.classList.remove('shake-vertical'); }, 400);
+           } else {
+               pleadingButton.classList.add('shake-horizontal');
+               setTimeout(() => { pleadingButton.classList.remove('shake-horizontal'); }, 400);
+           }
+           
+           scheduleNextUpdate();
+       };
+
+       const calculateMaxAllowedScale = () => {
+           // Temporarily set scale to 1.0 for accurate base measurement
+           // Ensure it's not hidden to get correct offsetWidth/Height
+           pleadingButton.style.setProperty('--scale', 1.0);
+           pleadingButton.classList.remove('hidden'); 
+           
+           // Force a reflow to ensure the browser has applied the scale=1.0 before measuring
+           pleadingButton.offsetWidth; // Read offsetWidth to force reflow
+
+           const baseButtonWidth = pleadingButton.offsetWidth;
+           const baseButtonHeight = pleadingButton.offsetHeight;
+
+           // Use a slightly smaller percentage to create a small buffer
+           const screenWidthLimit = window.innerWidth * 0.79; // Slightly less than 80%
+           const screenHeightLimit = window.innerHeight * 0.79; // Slightly less than 80%
+
+           // Calculate scale based on these adjusted limits
+           const scaleByWindowWidth = screenWidthLimit / baseButtonWidth;
+           const scaleByWindowHeight = screenHeightLimit / baseButtonHeight;
+           // Calculate scale based on fixed max width (600px)
+           const scaleByFixedWidth = MAX_WIDTH_PX / baseButtonWidth;
+
+           // The button should not exceed any of these limits
+           maxAllowedScale = Math.min(scaleByWindowWidth, scaleByWindowHeight, scaleByFixedWidth);
+           
+           // Ensure maxAllowedScale is at least 1.0, so the button doesn't shrink if the window is tiny
+           maxAllowedScale = Math.max(1.0, maxAllowedScale); 
+       };
+
+       const startPleading = () => {
+           clearTimeout(desperationTimeout);
+
+           // Reset state
+           desperationLevel = 0;
+           currentScale = 1.0;
+           shakeIntensity = 5; // Reset shake intensity to initial value
+           isAngry = false;
+           startTime = Date.now();
+           body.style.backgroundColor = '#374151'; 
+           
+           // Reset button style to initial blue
+           pleadingButton.style.background = `linear-gradient(to bottom, rgb(${startColor.top.r},${startColor.top.g},${startColor.top.b}), rgb(${startColor.bottom.r},${startColor.bottom.g},${startColor.bottom.b}))`;
+           pleadingButton.style.borderColor = `rgb(${startColor.bottom.r},${startColor.bottom.g},${startColor.bottom.b})`;
+           pleadingButton.style.borderTopColor = `rgb(${startColor.top.r},${startColor.top.g},${startColor.top.b})`;
+           pleadingButton.style.boxShadow = `0 10px 0 rgb(${startColor.shadow.r},${startColor.shadow.g},${startColor.shadow.b}), inset 0 1px 1px rgba(255, 255, 255, 0.2)`;
+
+           pleadingButton.style.setProperty('--scale', currentScale);
+           pleadingButton.style.setProperty('--shake-intensity', `${shakeIntensity}px`);
+           pleadingButton.textContent = "Press Me"; // Ensure text is reset here
+           
+           pleadingButton.classList.remove('hidden');
+           thankYouMessage.classList.add('hidden');
+
+           // Calculate base dimensions and max allowed scale on start
+           calculateMaxAllowedScale();
+
+           // Apply initial scale after calculation
+           currentScale = 1.0; 
+           pleadingButton.style.setProperty('--scale', currentScale); 
+
+           scheduleNextUpdate();
+       };
+
+       // Recalculate maxAllowedScale on window resize to ensure responsiveness
+       window.addEventListener('resize', () => {
+           // Recalculate maxAllowedScale
+           calculateMaxAllowedScale();
+           // Immediately apply the new max scale if current scale exceeds it
+           currentScale = Math.min(currentScale, maxAllowedScale);
+           pleadingButton.style.setProperty('--scale', currentScale);
+       });
+
+       // Event listeners
+       pleadingButton.addEventListener('click', () => {
+           clearTimeout(desperationTimeout);
+           pleadingButton.classList.add('hidden');
+           thankYouMessage.classList.remove('hidden');
+       });
+       resetButton.addEventListener('click', startPleading);
+
+       // Initial start
+       startPleading();
+   </script>
+
+</body>
+</html>
